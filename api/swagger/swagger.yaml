@@ -1,0 +1,256 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Hello World App
+# during dev, should point to your local machine
+host: localhost:10010
+# basePath prefixes all resource paths 
+basePath: /
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /movie:
+    # our controller name
+    x-swagger-router-controller: movieCollection
+    get:
+      operationId: getAll
+      description: get the movies list
+      parameters:
+      - name : review
+        description: review request in path
+        in: query
+        #required: true
+        type: boolean
+      # define the type of response for Success "200" and Error
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GetMoviesListResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      operationId: saveit
+      description: add a new movie to the list
+      # movie info to be stored
+      parameters:
+        - name: Title
+          description: Movie properties
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Movie"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GetMovieResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /movie/{Title}:
+    # our controller name
+    x-swagger-router-controller: movieCollection
+    get:
+      operationId : getOne
+      description: get a movie
+      # define the type of response for Success "200" and Error
+      parameters:
+        - name: Title
+          type: string
+          in: path
+          required: true
+        - name : review
+          description: review request in path
+          in: query
+          #required: true
+          type: boolean
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/MoviePut"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    put:
+      operationId : update
+      description: update a movie
+      # define the parameters
+      parameters:
+        - name: Title
+          description: search with this title
+          type: string
+          in: path
+          required: true
+        - name: movieInfo
+          description: attributes need to be updated
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/MoviePut"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GetMovieResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    delete:
+      operationId : delMovie
+      description: delete a movie
+      # define the parameters
+      parameters:
+        - name: Title
+          description: Movie title
+          type: string
+          in: path
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GeneralResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /review:
+    # our controller name
+    x-swagger-router-controller: movieCollection
+    get:
+      operationId: getrev
+      description: get the movies list
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GetMoviesListResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      operationId: saveReview
+      description: add a new movie to the list
+      # review to be stored
+      parameters:
+        - name: movie
+          description: movie name requeired for review
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Review"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GetMovieResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  GetMoviesListResponse:
+    properties:
+      movies:
+        type: array
+        items:
+           $ref: "#/definitions/Movie"
+  GetMovieResponse:
+    type: object
+    properties:
+      message:
+        type: string
+      movie:
+        type: object
+        items:
+          $ref: "#/definitions/Movie"
+  Movie:
+    type: object
+    required: 
+      - Title
+      - YearReleased
+    properties:
+      Title:
+        type: string
+      YearReleased:
+        type: number
+      Actors:
+        type: array
+        items:
+          $ref: "#/definitions/Actor"
+  Actor:
+    type: object
+    required: 
+      - Name
+    properties:
+      Name:
+        type: string
+  Review:
+    type: object
+    required: 
+      - movie   
+      - reviewer
+      - rating  
+      - text
+    properties:
+      movie:
+        type: string
+      reviewer:
+        type: string
+      rating:
+        type: number
+      text:
+        type: string
+  MoviePut:
+    type: object
+    properties:
+      Title:
+        type: string
+      YearReleased:
+        type: number
+      Actors:
+        type: array
+        items:
+          $ref: "#/definitions/ActorPut"
+  ActorPut:
+    type: object
+    properties:
+      Name:
+        type: string
+  GeneralResponse:
+    type: object
+    properties:
+      message: 
+        type: string
+      Title:
+        type: string
+  ErrorResponse:
+    required: 
+      - message
+    properties:
+      message:
+        type: string
+
+      
+      
+            
